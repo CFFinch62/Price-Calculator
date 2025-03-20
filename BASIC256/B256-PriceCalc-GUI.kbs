@@ -1,0 +1,331 @@
+#####################################################
+# PROGRAM: GUI PRICE CALCULATOR
+# AUTHOR: CHUCK FINCH - (c) 2019 ChuckSoft
+# LAST UPDATED - 10/30/2019
+# PURPOSE:  Calculator to show relationship between:
+#           Sale Price, Gross Margin, Gross Profit, 
+#           Markup, and Cost 
+#####################################################
+
+# INITIALIZE GLOBALS
+font("Times New Roman", 28, 75)
+global price$, margin$, profit$, markup$, cost$, calcType$, price, margin, profit, markup, cost, valueCount
+quit = false
+clickclear()
+
+# START MAIN PROGRAM LOOP
+clg
+call CreateUI()
+call resetGlobals()
+call eventHandler()
+end
+# END MAIN PROGRAM LOOP
+
+
+# Create GUI structure by creating various control in graphics window
+subroutine CreateUI()
+  call DrawControl("win","main",white,darkblue,1,640,480,0,0)
+  call DrawControl("lbl","        PRICE($):",white,darkblue,0,20,40,0,0)
+  call DrawControl("lbl"," MARGIN(%):",white,darkblue,0,20,100,0,0)
+  call DrawControl("lbl","     PROFIT($):",white,darkblue,0,20,160,0,0)
+  call DrawControl("lbl","MARKUP(%):",white,darkblue,0,20,220,0,0)
+  call DrawControl("lbl","          COST($):",white,darkblue,0,20,280,0,0)
+  call DrawControl("tbx","",black,cyan,1,300,40,0,0)
+  call DrawControl("tbx","",black,cyan,1,300,100,0,0)
+  call DrawControl("tbx","",black,cyan,1,300,160,0,0)
+  call DrawControl("tbx","",black,cyan,1,300,220,0,0)
+  call DrawControl("tbx","",black,cyan,1,300,280,0,0)
+  call DrawControl("btn","?",blue,grey,5,20,380,60,75)
+  call DrawControl("btn","RESET",red,grey,5,120,380,60,150)
+  call DrawControl("btn","CALCULATE",green,grey,5,300,380,60,300)
+  call DrawTitleBar("***BASIC256 GUI PRICE CALCULATOR***")
+end subroutine
+
+#START OF PROGRAM SUBROUTINES
+# Draw a control on graphics window
+# ctl -> type of control
+#        win -> window
+#	      tbx -> textbox
+#	     lbl -> label
+#	     btn -> button
+#	txt -> caption(win,lbl,btn), text(tbx)
+# fg -> foreground color (win,lbl.tbx,btn)     
+# bg -> background color (win,tbx,btn, lbl[set = window bg for transparent] ) 
+# x, y -> sets upper left corner of control
+# h, w -> sets height and width of control
+subroutine DrawControl (ctl$, txt$, fg, bg, bd, x, y, h, w)
+  begin case
+    case ctl$ = "win"					# Creates a program window
+      graphsize(x, y) 					# Sets size of window
+      color(fg, bg)					   		# Sets border color and background fill color 
+      penwidth(bd)						# Sets border width
+      rect(0,0,x,y)							# Applies all above features
+    case ctl$ = "lbl"					#Creates a label  control
+      color(fg, bg)							# Sets border color and background fill color 
+      text(x,y,txt$)						# Sets lable text  
+    case ctl$ = "tbx"					#Creates a textbox control
+      color(fg, bg)							# Sets text/border color and background fill color 
+      penwidth(bd)						# Sets border width
+      rect(x,y,300, 50)					# Applies all above features
+    case ctl$ = "btn"					#Creates a button control
+      color(fg, bg)							# Sets text/border color and background fill color 
+      penwidth(bd)						# Sets border width
+      rect(x,y,w,h)						# Draws button with above featues except caption
+     # Draw button captions     
+      begin case
+        case txt$ = "?"
+          text((x+30),(y+10),txt$)
+	 case txt$ = "RESET"
+          text((x+15),(y+10),txt$)
+        case txt$ = "CALCULATE"
+          text((x+35),(y+10),txt$)
+        end case
+    else
+      # Show warning message is unknown control type
+      alert("Invalid Control Type!")
+  end case
+end subroutine
+
+# Draw a window title bar with exit button
+subroutine DrawTitleBar(title$)
+  # Change to title font 
+  font("Times New Roman", 14, 75) 
+  # Darw title bar with caption
+  color(black, grey)
+  penwidth(1)
+  rect(1,0,638,20)
+  text(120,0,title$)
+  # Draw exit button
+  color(black, red)
+  penwidth(1)
+  rect(620,1,18,18) 
+  text(623,0,"X")	
+  # Restoer default program font
+  font("Times New Roman", 28, 75) 
+end subroutine
+
+subroutine resetGlobals()
+  # Redraw all textboxes as empty
+  call DrawControl("tbx","",black,cyan,1,300,40,0,0)
+  call DrawControl("tbx","",black,cyan,1,300,100,0,0)
+  call DrawControl("tbx","",black,cyan,1,300,160,0,0)
+  call DrawControl("tbx","",black,cyan,1,300,220,0,0)
+  call DrawControl("tbx","",black,cyan,1,300,280,0,0)
+  price$ = ""
+  margin$ = ""
+  profit$ = ""
+  markup$ = ""
+  cost$ = ""
+  price = 0
+  margin = 0
+  profit = 0
+  markup = 0
+  cost = 0
+  valueCount = 0
+  calcType$ = ""
+end subroutine
+
+subroutine getCalcType()
+		if price$ <> "" then
+		  calcType$ += "Price"
+		end if
+		if margin$ <> "" then
+		  calcType$ += "Margin"
+		end if
+		if profit$ <> "" then
+		  calcType$ += "Profit"
+		end if
+		if markup$ <> "" then
+		  calcType$ += "Markup"
+		end if
+		if cost$ <> "" then
+		  calcType$ += "Cost"
+		end if		
+end subroutine
+
+subroutine calculateValues()
+  begin case
+    case calcType$ = "PriceMargin" #CONFIRMED
+      profit = price * (margin / 100)
+      cost = price - profit
+      markup = (profit / cost) * 100
+      call displayResults()
+    case calcType$ = "PriceProfit" #CONFIRMED
+      cost = price - profit
+      markup = (profit / cost) * 100
+      margin = (profit / price) * 100
+      call displayResults()
+    case calcType$ = "PriceMarkup" #CONFIRMED
+      cost = price / (1 + (markup / 100))
+      profit = cost * (markup / 100)
+      margin = (profit / price) * 100 
+      call displayResults()
+    case calcType$ = "PriceCost" #CONFIRMED
+      profit = price - cost
+      margin = (profit / price) * 100
+      markup = (profit / cost) * 100
+      call displayResults()
+    case calcType$ = "MarginProfit" #CONFIRMED
+      price = profit / (margin / 100)
+      cost = price - profit
+      markup = (profit / cost) * 100
+      call displayResults()
+    case calcType$ = "MarginMarkup"
+      alert("This calculation cannot be completed! See help(?).")
+      call resetGlobals()
+    case calcType$ = "MarginCost" #CONFIRMED
+      profit = cost * ((margin / 100) / (1 - (margin / 100)))
+      price = cost + profit
+      markup = (profit / cost) * 100
+      call displayResults()
+    case calcType$ = "ProfitMarkup" #CONFIRMED
+      cost = profit / (markup / 100)
+      price = cost + profit
+      margin = (profit / price) * 100
+      call displayResults()
+    case calcType$ = "ProfitCost" #CONFIRMED
+      price = cost + profit
+      margin = (profit / price) * 100
+      markup = (profit / cost) * 100
+      call displayResults()    
+    case calcType$ = "MarkupCost" #CONFIRMED
+      price = cost + (cost * (markup / 100))
+      profit = price - cost
+      margin = (profit / price) * 100    
+      call displayResults()
+  end case    
+end subroutine
+
+subroutine displayResults()
+  call DrawControl("lbl",price,black,cyan,1,305,40,0,0)
+  call DrawControl("lbl",margin,black,cyan,1,305,100,0,0)
+  call DrawControl("lbl",profit,black,cyan,1,305,160,0,0)
+  call DrawControl("lbl",markup,black,cyan,1,305,220,0,0)
+  call DrawControl("lbl",cost,black,cyan,1,305,280,0,0)
+end subroutine
+
+subroutine eventHandler()
+quit = false
+#Mouse click event hanlder loop
+while quit = false
+  # Was left button clicked?
+  if clickb = 1 then
+    # Was HELP button clicked?
+    if mousex > 25 then
+      if mousex < 65 then
+        # Display baasic how-to message box
+        alert("Enter any 2 values (exept Margin and Markup only) and click CALCULATE. The remainging values will be displayed")
+        clickclear()
+      end if
+    end if
+    # Was RESET button cllicked?
+    if mousex > 125 then
+      if mousex < 265 then
+        # Reset textboxes
+        call resetGlobals()
+        clickclear()
+      end if
+    end if
+    #Determine which control on the right half of the screen was clicked
+    if mousex > 305 then
+      if mousex < 595 then
+        begin case
+          # Price textbox was clicked
+          case mousey < 85
+            # If less than 2 values have been entered proceed
+            if valueCount < 2 then
+              #Get input from user
+              price$ = prompt("Enter Price")
+              # Convert text to number
+              price = Float(price$)
+              # Place the input text in the textbox
+              call DrawControl("lbl",price$,black,cyan,1,305,40,0,0)
+              # if input is not empty increment value counter
+              if price$ <> "" then
+                valueCount += 1
+              end if
+              # Clear mouce click event ID
+              clickclear()
+            else
+              # If this input makes value counter exceed 2 show warning message
+              alert("2 values have aleady been entered. Click CALCULATE or RESET.")
+              clickclear()
+            end if
+       # Margin textbox was clicked	   
+	   case mousey < 145
+            if valueCount < 2 then
+              margin$ = prompt("Enter Margin")
+              margin = Float(margin$)
+              call DrawControl("lbl",margin$,black,cyan,1,305,100,0,0)
+              if margin$ <> "" then
+                valueCount += 1
+              end if   
+              clickclear()
+            else
+              alert("2 values have aleady been entered. Click CALCULATE or RESET.")
+              clickclear()
+            end if  
+          # Profit textbox was clicked     
+          case mousey < 205
+            if valueCount < 2 then
+              profit$ = prompt("Enter Profit")
+              profit = Float(profit$)
+              call DrawControl("lbl",profit$,black,cyan,1,305,160,0,0)
+              if profit$ <> "" then
+                valueCount += 1
+              end if
+              clickclear()
+            else
+              alert("2 values have aleady been entered. Click CALCULATE or RESET.")
+              clickclear()
+            end if
+          # Markup textbox was clicked  
+          case mousey < 265
+            if valueCount < 2 then
+              markup$ = prompt("Enter Markup %")
+              markup = Float(markup$)
+              call DrawControl("lbl",markup$,black,cyan,1,305,220,0,0)
+              if markup$ <> "" then
+                valueCount += 1
+              end if  
+              clickclear()
+            else
+              alert("2 values have aleady been entered. Click CALCULATE or RESET.")
+              clickclear()
+            end if
+          # Cost textbox was clicked        
+          case mousey < 325
+            if valueCount < 2 then
+              cost$ = prompt("Enter Cost $")
+              cost = Float(cost$)
+              call DrawControl("lbl",cost$,black,cyan,1,305,280,0,0)
+              if cost$ <> "" then
+                valueCount += 1
+              end if 
+              clickclear()
+            else
+              alert("2 values have aleady been entered. Click CALCULATE or RESET.")
+              clickclear()
+            end if
+          # CALCULATE button was clicked    
+          case mousey < 425
+            call getCalcType()
+			call calculateValues()            
+            clickclear()
+          else
+            clickclear()
+        end case 
+      end if
+    end if
+    # Exit button was clicked
+    if mousex > 620 then
+      if mousey < 20 then
+        #  Set 'quit' to exit while loop and end program
+        quit = true
+        clickclear()
+      end if
+    end if  
+  end if
+end while
+end subroutine
+#END OF PROGRAM SUBROUTINES

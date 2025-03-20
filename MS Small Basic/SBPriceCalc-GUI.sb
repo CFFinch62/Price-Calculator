@@ -1,0 +1,279 @@
+'MAIN PROGRAM START
+
+InitializeProgram()
+
+
+'MAIN PROGRAM SUBROUTINES
+
+'Create Program GUI
+Sub InitializeProgram
+  'Center Main Window
+  GraphicsWindow.Left = 0.5 * (Desktop.Width - GraphicsWindow.Width)
+  GraphicsWindow.Top = 0.5 * (Desktop.Height - GraphicsWindow.Height)
+  
+  ' Show Main Window
+  GraphicsWindow.Show()
+  GraphicsWindow.BackgroundColor = "DarkBlue"
+  GraphicsWindow.Title = "SB PRICE CALCULATOR"
+  GraphicsWindow.Width = 340
+  GraphicsWindow.Height =300
+  GraphicsWindow.FontSize = 20
+  
+  'Create all labels
+  GraphicsWindow.BrushColor = "Yellow"
+  GraphicsWindow.DrawText(10,20,"      PRICE($):")
+  GraphicsWindow.DrawText(10,60,"MARGIN(%):")
+  GraphicsWindow.DrawText(10,100,"    PROFIT($):")
+  GraphicsWindow.DrawText(10,140,"MARKUP(%):")
+  GraphicsWindow.DrawText(10,180,"        COST($):")
+  
+  'Create all textboxes
+  GraphicsWindow.BrushColor = "Black"
+  txtPrice = Controls.AddTextBox(160,20)
+  txtMargin = Controls.AddTextBox(160,60)
+  txtProfit = Controls.AddTextBox(160,100)
+  txtMarkup = Controls.AddTextBox(160,140)
+  txtCost = Controls.AddTextBox(160,180)
+  
+  'Create all buttons
+  GraphicsWindow.BrushColor = "Blue"
+  btnHelp = Controls.AddButton("?",20,240)
+  GraphicsWindow.BrushColor = "Red"
+  btnReset = Controls.AddButton("RESET",80,240)
+  GraphicsWindow.BrushColor = "Green"
+  btnCalculate = Controls.AddButton("CALCULATE",190,240)
+  
+  'Declare all event handlers
+  Controls.ButtonClicked = ButtonEventHandler
+EndSub
+
+'Process Button Click Events
+Sub ButtonEventHandler
+  If Controls.LastClickedButton = btnCalculate Then
+    Calculate()
+  ElseIf Controls.LastClickedButton = btnReset Then
+    FormReset()
+  ElseIf Controls.LastClickedButton = btnHelp Then
+    GraphicsWindow.ShowMessage("Enter any 2 values (except Markup and Margin together) and click CALCULATE to see all other values.","Price Calc Help")
+  EndIf
+EndSub
+
+'Clear all TextBoxes
+Sub FormReset
+  Controls.SetTextBoxText(txtPrice,"")
+  Controls.SetTextBoxText(txtMargin,"")
+  Controls.SetTextBoxText(txtProfit,"")
+  Controls.SetTextBoxText(txtMarkup,"")
+  Controls.SetTextBoxText(txtCost,"")
+EndSub
+
+'Call subroutine to determine what data has been supplied in TextBoxes
+'Call specific calculation subroutine based upon data supplied 
+'Display message boxes for entry errors
+Sub Calculate
+  GetCalcType()
+  If intValueCount <> 2 Then
+    GraphicsWindow.ShowMessage("There must be exactly 2 values entered to complete calculation","Entry Error")
+    FormReset()
+  Else
+    If strCalcType = "PriceMargin" Then
+      CalcPriceMargin()
+    ElseIf strCalcType = "PriceProfit" Then
+      CalcPriceProfit()
+    ElseIf strCalcType = "PriceMarkup" Then
+      CalcPriceMarkup()
+    ElseIf strCalcType = "PriceCost" Then
+      CalcPriceCost()
+    ElseIf strCalcType = "MarginProfit" Then
+      CalcMarginProfit()
+    ElseIf strCalcType = "MarginMarkup" Then
+      GraphicsWindow.ShowMessage("Margin and Markup alone cannot be used for calculation, Enter one OR the other and any other single value for a valid calculation.","Entry Error")
+      FormReset()
+    ElseIf strCalcType = "MarginCost" Then
+      CalcMarginCost()
+    ElseIf strCalcType = "ProfitMarkup" Then
+      CalcProfitMarkup()
+    ElseIf strCalcType = "ProfitCost" Then
+      CalcProfitCost()
+    ElseIf strCalcType = "MarkupCost" Then
+      CalcMarkupCost()
+    EndIf
+  EndIf
+EndSub
+
+'Create string that indicates what data has been supplied in TextBoxes
+Sub GetCalcType
+  strCalcType = ""
+  intValueCount = 0
+  strPrice = Controls.GetTextBoxText(txtPrice)
+  strMargin = Controls.GetTextBoxText(txtMargin)
+  strProfit = Controls.GetTextBoxText(txtProfit)
+  strMarkup = Controls.GetTextBoxText(txtMarkup)
+  strCost = Controls.GetTextBoxText(txtCost)
+  If strPrice <> "" Then
+    strCalcType = "Price"
+    intValueCount = intValueCount + 1
+  EndIf
+  If strMargin <> "" Then
+    strCalcType = strCalcType + "Margin"
+    intValueCount = intValueCount + 1
+  EndIf
+  If strProfit <> "" Then
+    strCalcType = strCalcType + "Profit"
+    intValueCount = intValueCount + 1
+  EndIf
+  If strMarkup <> "" Then
+    strCalcType = strCalcType + "Markup"
+    intValueCount = intValueCount + 1
+  EndIf
+  If strCost <> "" Then
+    strCalcType = strCalcType + "Cost"
+    intValueCount = intValueCount + 1
+  EndIf
+  
+EndSub
+
+'SPECIFIC CALCULATION SUBROUTINES
+
+'Price/Margin suplied, Profit/Markup/Cost calculated
+Sub CalcPriceMargin
+  
+  Profit = 0
+  Markup = 0
+  Cost = 0
+  
+  Margin = strMargin / 100
+
+  Profit = strPrice * Margin
+  Cost = strPrice - Profit
+  Markup = (Profit / Cost) * 100
+  
+  Controls.SetTextBoxText(txtProfit, Profit)
+  Controls.SetTextBoxText(txtMarkup, Markup)
+  Controls.SetTextBoxText(txtCost, Cost)
+
+EndSub
+
+'Price/Profit suplied, Margin/Markup/Cost calculated
+Sub CalcPriceProfit
+  
+  Margin = 0
+  Markup = 0
+  Cost = 0
+  
+  Cost = strPrice - strProfit
+  Markup = (strProfit / Cost) * 100
+  Margin = (strProfit / strPrice) * 100
+
+  Controls.SetTextBoxText(txtMargin, Margin)
+  Controls.SetTextBoxText(txtMarkup, Markup)
+  Controls.SetTextBoxText(txtCost, Cost)
+  
+EndSub
+
+'Price/Markup suplied, Margin/Profit/Cost calculated
+Sub CalcPriceMarkup
+  Profit = 0
+  Margin = 0
+  Cost = 0
+
+  Cost = strPrice / (1 + (strMarkup / 100))
+  Profit = Cost * (strMarkup / 100)
+  Margin = (Profit / strPrice ) * 100
+
+  Controls.SetTextBoxText(txtProfit, Profit)
+  Controls.SetTextBoxText(txtMargin, Margin)
+  Controls.SetTextBoxText(txtCost, Cost)
+  
+EndSub
+
+'Price/Cost suplied, Margin/Profit/Markup calculated
+Sub CalcPriceCost
+  Profit = 0
+  Margin = 0
+  Markup = 0
+  
+  Profit = strPrice - strCost
+  Margin = (Profit / strPrice) * 100
+  Markup = (Profit / strCost) * 100
+
+  Controls.SetTextBoxText(txtProfit, Profit)
+  Controls.SetTextBoxText(txtMargin, Margin)
+  Controls.SetTextBoxText(txtMarkup, Markup)
+  
+EndSub
+
+'Margin/Profit suplied, Price/Markup/Cost calculated
+Sub CalcMarginProfit
+  Price = 0
+  Markup = 0
+  Cost = 0
+
+  Price = strProfit / (strMargin / 100)
+  Cost = Price - strProfit
+  Markup = (strProfit / Cost) * 100
+
+  Controls.SetTextBoxText(txtPrice, Price)
+  Controls.SetTextBoxText(txtMarkup, Markup)
+  Controls.SetTextBoxText(txtCost, Cost)
+EndSub
+
+'Margin/Cost suplied, Price/Profit/Markup calculated
+Sub CalcMarginCost
+  Price = 0
+  Profit = 0
+  Markup = 0
+
+  Profit = strCost * ((strMargin / 100) / (1 - (strMargin / 100)))
+  Price = Cost + Profit
+  Markup = (Profit / Cost) * 100
+
+  Controls.SetTextBoxText(txtPrice, Price)
+  Controls.SetTextBoxText(txtProfit, Profit)
+  Controls.SetTextBoxText(txtMarkup, Markup)
+EndSub
+
+'Profit/Markup suplied, Price/Margin/Cost calculated
+Sub CalcProfitMarkup
+  Price = 0
+  Margin = 0
+  Cost = 0
+
+  Cost = strProfit / (strMarkup / 100)
+  Price = Cost + strProfit
+  Margin = (Profit / Price) * 100
+
+  Controls.SetTextBoxText(txtPrice, Price)
+  Controls.SetTextBoxText(txtMargin, Margin)
+  Controls.SetTextBoxText(txtCost, Cost)
+EndSub
+
+'Profit/Cost suplied, Price/Margin/Markup calculated
+Sub CalcProfitCost
+  Price = 0
+  Margin = 0
+  Markup = 0
+
+  Price = strCost + strProfit
+  Margin = (strProfit / Price) * 100
+  Markup = (Profit / strCost) * 100
+
+  Controls.SetTextBoxText(txtPrice, Price)
+  Controls.SetTextBoxText(txtMargin, Margin)
+  Controls.SetTextBoxText(txtMarkup, Markup)
+EndSub
+
+'Markup/Cost suplied, Price/Margin/Profit calculated
+Sub CalcMarkupCost
+  Price = 0
+  Margin = 0
+  Profit = 0
+
+  Price = strCost + (strCost * (strMarkup / 100))
+  Profit = Price - strCost
+  Margin = (Profit / Price) * 100
+
+  Controls.SetTextBoxText(txtPrice, Price)
+  Controls.SetTextBoxText(txtMargin, Margin)
+  Controls.SetTextBoxText(txtProfit, Profit)
+EndSub

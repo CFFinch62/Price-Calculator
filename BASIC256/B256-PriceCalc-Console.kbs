@@ -1,0 +1,226 @@
+#Initialize globals
+global Price, Margin, Profit, Markup, Cost, Price$, Margin$, Profit$, Markup$, Cost$, CalcID$, newCalc$
+newCalc$ = "no"
+
+#Display program header
+print "BASIC256 Console Price Calculator"
+print
+print "Each calculation requires 2 inputs and produces 3 outputs."
+print "Price, Profit and Cost are monetary values."
+print "Margin and Markup are percentage values."
+
+call Display_Menu()
+
+subroutine Display_Menu()
+  print
+  print "Select the desired calculation # from the list below,"
+  print "based on the values you are prepared to enter:"
+  print
+  print " Price and Margin: 1"
+  print " Price and Profit: 2"
+  print " Price and Markup: 3"
+  print "   Price and Cost: 4"
+  print "Margin and Profit: 5"
+  print "  Margin and Cost: 6"
+  print "Profit and Markup: 7"
+  print "  Profit and Cost: 8"
+  print "  Markup and Cost: 9"
+  print
+  CalcID$ = prompt("Enter calculation number: ")
+  call Calculate_Values()
+end subroutine
+
+subroutine Entry_Error()
+  print "Entry Error: Invlaid Input!"
+  call Repeat()
+end subroutine 
+
+subroutine Calculate_Values()
+  begin case
+    case CalcID$ = "1"
+      Price$ = prompt("Enter Price: ")
+      Price =float(Price$)
+      if Price = 0 then
+        call Entry_Error()
+      end if
+      Margin$ = prompt("Enter Margin: ")
+      Margin = float(Margin$)
+      if Margin = 0 then
+        call Entry_Error()
+      end if
+      Profit = 0
+      Markup = 0
+      Cost = 0
+      Profit = Price * (Margin / 100)
+      Cost = Price - Profit
+      Markup = (Profit / Cost) * 100
+      call Display_Values()
+    case CalcID$ = "2"
+      Price$ = prompt("Enter Price: ")
+      Price = float(Price$)
+      if Price = 0 then
+        call Entry_Error()
+      end if
+      Profit$ = prompt("Enter Profit: ")
+      Profit = float(Profit$)
+      If Profit = 0 Then
+        call Entry_Error()
+      end if  
+      Margin = 0
+      Markup = 0
+      Cost = 0
+      Cost = Price - Profit
+      Markup = (Profit / Cost) * 100
+      Margin = (Profit / Price) * 100
+      call Display_Values()
+    case CalcID$ = "3"
+      Price$ = prompt("Enter Price: ")
+      Price = float(Price$)
+      if Price = 0 then
+        call Entry_Error()
+      end if   
+      Markup$ = prompt("Enter Markup: ")
+      Markup = float(Markup$)
+      if Markup = 0 then
+        call Entry_Error()
+      end if  
+      Profit = 0
+      Margin = 0
+      Cost = 0
+      Cost = Price / (1 + (Markup / 100))
+      Profit = Cost * (Markup / 100)
+      Margin = (Profit / Price ) * 100
+      call Display_Values()
+    case CalcID$ = "4"
+      Price$ = prompt("Enter Price: ")
+      Price = float(Price$)
+      if Price = 0 then
+        call Entry_Error()
+      end if  
+      Cost$ = prompt("Enter Cost: ")
+      Cost = float(Cost$)
+      if Cost = 0 then
+        call Entry_Error()
+      end if  
+      Profit = 0
+      Margin = 0
+      Markup = 0
+      Profit = Price - Cost
+      Margin = (Profit / Price) * 100
+      Markup = (Profit / Cost) * 100
+      call Display_Values()  
+    case CalcID$ = "5"
+      Margin$ = prompt("Enter Margin: ")
+      Margin = float(Margin$)
+      if Margin = 0 then
+        call Entry_Error()
+      end if  
+      Profit$ = prompt("Enter Profit: ")
+      Profit = float(Profit$)
+      if Profit = 0 then
+        call Entry_Error()
+      end if  
+      Price = 0
+      Markup = 0
+      Cost = 0
+      Price = Profit / (Margin / 100)
+      Cost = Price - Profit
+      Markup = (Profit / Cost) * 100
+      call Display_Values()
+    case CalcID$ = "6" 
+      Margin$ = prompt("Enter Margin: ")
+      Margin = float(Margin$)
+      if Margin = 0 then
+        call Entry_Error()
+      end if  
+      Cost$ = prompt("Enter Cost: ")
+      Cost = float(Cost$)
+      if Cost = 0 then
+        call Entry_Error()
+      end if  
+      Price = 0
+      Profit = 0
+      Markup = 0
+      Profit = Cost * ((Margin / 100) / (1 - (Margin / 100)))
+      Price = Cost + Profit
+      Markup = (Profit / Cost) * 100
+      call Display_Values()
+    case CalcID$ = "7"
+      Profit$ = prompt("Enter Profit: ")
+      Profit = float(Profit$)
+      if Profit = 0 then
+        call Entry_Error()
+      end if  
+      Markup$ = prompt("Enter Markup: ")
+      Markup = float(Markup$)
+      if Markup = 0 then
+        call Entry_Error()
+      end if
+      Price = 0
+      Margin = 0
+      Cost = 0
+      Cost = Profit / (Markup / 100)
+      Price = Cost + Profit
+      Margin = (Profit / Price) * 100
+      call Display_Values()
+    case CalcID$ = "8"
+      Profit$ = prompt("Enter Profit: ")
+      Profit = float(Profit$)
+      if Profit = 0 then
+        call Entry_Error()
+      end if  
+      Cost$ = prompt("Enter Cost: ")
+      Cost = float(Cost$)
+      if Cost = 0 then
+        call Entry_Error()
+      end if  
+      Price = 0
+      Margin = 0
+      Markup = 0
+      Price = Cost + Profit
+      Margin = (Profit / Price) * 100
+      Markup = (Profit / Cost) * 100
+      call Display_Values()
+    case CalcID$ = "9"
+      Markup$ = prompt("Enter Markup: ")
+      Markup = float(Markup$)
+      if Markup = 0 then
+        call Entry_Error()
+      end if
+      Cost$ = prompt("Enter Cost: ")
+      Cost = float(Cost$)
+      if Cost = 0 then
+        call Entry_Error()
+      end if  
+      Price = 0
+      Margin = 0
+      Profit = 0
+      Price = Cost + (Cost * (Markup / 100))
+      Profit = Price - Cost
+      Margin = (Profit / Price) * 100
+      call Display_Values()
+    else
+      call Entry_Error()
+      call Calculate_Values()
+    end case
+end subroutine
+
+subroutine Display_Values()
+  print " Price($): " + Price
+  print "Margin(%): " + Margin
+  print "Profit($): " + Profit
+  print "Markup(%): " + Markup
+  print "  Cost($): " + Cost
+  call Repeat()
+end subroutine
+
+subroutine Repeat()
+  newCalc$ = prompt( "Enter 'yes' for another calculation. Press any other key to exit: ")
+  if newCalc$ = "yes" then
+    cls
+    call Display_Menu()
+  else
+    cls
+    end
+  end if
+end subroutine

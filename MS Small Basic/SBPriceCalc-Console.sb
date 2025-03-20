@@ -1,0 +1,262 @@
+'Initialize global values
+Price = 0
+Margin = 0
+Profit = 0
+Markup = 0
+Cost = 0
+CalcID = 0
+newCalc = ""
+
+'Initiate the console window
+TextWindow.Show()
+TextWindow.ForegroundColor = "Yellow"
+TextWindow.Title = "MS SmallBasic Console Price Calculator"
+TextWindow.WriteLine("***Welcome to the Small Basic Price Calculator***")
+TextWindow.WriteLine("")
+TextWindow.WriteLine("Each calculation requires 2 inputs and produces 3 outputs.")
+TextWindow.WriteLine("Price, Profit and Cost are monetary values.")
+TextWindow.WriteLine("Margin and Markup are percentage values.")
+
+Display_Menu()
+
+
+Sub Display_Menu
+  
+  TextWindow.WriteLine("")
+  TextWindow.WriteLine("Select the desired calculation # from the list below,")
+  TextWindow.WriteLine("based on the values you are prepared to enter:")
+  TextWindow.WriteLine("")
+  TextWindow.WriteLine(" Price and Margin: 1")
+  TextWindow.WriteLine(" Price and Profit: 2")
+  TextWindow.WriteLine(" Price and Markup: 3")
+  TextWindow.WriteLine("   Price and Cost: 4")
+  TextWindow.WriteLine("Margin and Profit: 5")
+  TextWindow.WriteLine("  Margin and Cost: 6")
+  TextWindow.WriteLine("Profit and Markup: 7")
+  TextWindow.WriteLine("  Profit and Cost: 8")
+  TextWindow.WriteLine("  Markup and Cost: 9")
+  TextWindow.WriteLine("")
+  TextWindow.Write("Enter calculation number: ")
+  CalcID = TextWindow.ReadNumber()
+  Calculate_Values()
+  
+EndSub
+
+Sub Entry_Error
+  TextWindow.WriteLine("")
+  TextWindow.WriteLine("Entry Error: Invlaid Input!") 
+  Repeat()
+EndSub 
+
+Sub Calculate_Values
+  
+  TextWindow.Clear()
+  If CalcID = 1 Then
+    TextWindow.WriteLine("")
+    TextWindow.Write("Enter Price: ")
+    Price = TextWindow.ReadNumber()
+    If Price = 0 Then
+      Entry_Error()
+    EndIf
+    TextWindow.Write("Enter Margin: ")
+    Margin = TextWindow.ReadNumber()
+    If Margin = 0 Then
+      Entry_Error()
+    EndIf
+    Profit = 0
+    Markup = 0
+    Cost = 0
+    Profit = Price * (Margin / 100)
+    Cost = Price - Profit
+    Markup = (Profit / Cost) * 100
+    Display_Values()
+    
+  ElseIf CalcID = 2 Then
+    TextWindow.WriteLine("")
+    TextWindow.Write("Enter Price: ")
+    Price = TextWindow.ReadNumber()
+    If Price = 0 Then
+      Entry_Error()
+    EndIf
+    TextWindow.Write("Enter Profit: ")
+    Profit = TextWindow.ReadNumber()
+    If Profit = 0 Then
+      Entry_Error()
+    EndIf  
+    Margin = 0
+    Markup = 0
+    Cost = 0
+    Cost = Price - Profit
+    Markup = (Profit / Cost) * 100
+    Margin = (Profit / Price) * 100
+    Display_Values()
+    
+  ElseIf CalcID = 3 Then
+    TextWindow.WriteLine("")
+    TextWindow.Write("Enter Price: ")
+    Price = TextWindow.ReadNumber()
+    If Price = 0 Then
+      Entry_Error()
+    EndIf   
+    TextWindow.Write("Enter Markup: ")
+    If Markup = 0 Then
+      Entry_Error()
+    EndIf  
+    Markup = TextWindow.ReadNumber()
+    Profit = 0
+    Margin = 0
+    Cost = 0
+    Cost = Price / (1 + (Markup / 100))
+    Profit = Cost * (Markup / 100)
+    Margin = (Profit / Price ) * 100
+    Display_Values()
+    
+  ElseIf CalcID = 4 Then
+    TextWindow.WriteLine("")
+    TextWindow.Write("Enter Price: ")
+    Price = TextWindow.ReadNumber()
+    If Price = 0 Then
+      Entry_Error()
+    EndIf  
+    TextWindow.Write("Enter Cost: ")
+    Cost = TextWindow.ReadNumber()
+    If Cost = 0 Then
+      Entry_Error()
+    EndIf  
+    Profit = 0
+    Margin = 0
+    Markup = 0
+    Profit = Price - Cost
+    Margin = (Profit / Price) * 100
+    Markup = (Profit / Cost) * 100
+    Display_Values()  
+    
+  ElseIf CalcID = 5 Then
+    TextWindow.WriteLine("")
+    TextWindow.Write("Enter Margin: ")
+    Margin = TextWindow.ReadNumber()
+    If Margin = 0 Then
+      Entry_Error()
+    EndIf  
+    TextWindow.Write("Enter Profit: ")
+    Profit = TextWindow.ReadNumber()
+    If Profit = 0 Then
+      Entry_Error()
+    EndIf  
+    Price = 0
+    Markup = 0
+    Cost = 0
+    Price = Profit / (Margin / 100)
+    Cost = Price - Profit
+    Markup = (Profit / Cost) * 100
+    Display_Values()
+    
+  ElseIf CalcID = 6 Then
+    TextWindow.WriteLine("")
+    TextWindow.Write("Enter Margin: ")
+    Margin = TextWindow.ReadNumber()
+    If Margin = 0 Then
+      Entry_Error()
+    EndIf  
+    TextWindow.Write("Enter Cost: ")
+    Cost = TextWindow.ReadNumber()
+    If Cost = 0 Then
+      Entry_Error()
+    EndIf  
+    Price = 0
+    Profit = 0
+    Markup = 0
+    Profit = Cost * ((Margin / 100) / (1 - (Margin / 100)))
+    Price = Cost + Profit
+    Markup = (Profit / Cost) * 100
+    Display_Values()
+    
+  ElseIf CalcID = 7 Then
+    TextWindow.WriteLine("")
+    TextWindow.Write("Enter Profit: ")
+    If Profit = 0 Then
+      Entry_Error()
+    EndIf  
+    Profit = TextWindow.ReadNumber()
+    TextWindow.Write("Enter Markup: ")
+    Markup = TextWindow.ReadNumber()
+    If Markup = 0 Then
+      Entry_Error()
+    EndIf
+    Price = 0
+    Margin = 0
+    Cost = 0
+    Cost = Profit / (Markup / 100)
+    Price = Cost + Profit
+    Margin = (Profit / Price) * 100
+    Display_Values()
+    
+  ElseIf CalcID = 8 Then
+    TextWindow.WriteLine("")
+    TextWindow.Write("Enter Profit: ")
+    Profit= TextWindow.ReadNumber()
+    If Profit = 0 Then
+      Entry_Error()
+    EndIf  
+    TextWindow.Write("Enter Cost: ")
+    Cost = TextWindow.ReadNumber()
+    If Cost = 0 Then
+      Entry_Error()
+    EndIf  
+    Price = 0
+    Margin = 0
+    Markup = 0
+    Price = Cost + Profit
+    Margin = (Profit / Price) * 100
+    Markup = (Profit / Cost) * 100
+    Display_Values()
+    
+  ElseIf CalcID = 9 Then
+    TextWindow.WriteLine("")
+    TextWindow.Write("Enter Markup: ")
+    Markup = TextWindow.ReadNumber()
+    If Markup = 0 Then
+      Entry_Error()
+    EndIf
+    TextWindow.Write("Enter Cost: ")
+    Cost = TextWindow.ReadNumber()
+    If Cost = 0 Then
+      Entry_Error()
+    EndIf  
+    Price = 0
+    Margin = 0
+    Profit = 0
+    Price = Cost + (Cost * (Markup / 100))
+    Profit = Price - Cost
+    Margin = (Profit / Price) * 100
+    Display_Values()
+    
+  Else
+    Entry_Error()
+    Calculate_Values()
+  EndIf
+  
+EndSub
+
+Sub Display_Values
+  TextWindow.WriteLine("")
+  TextWindow.WriteLine(" Price($): " + Price)
+  TextWindow.WriteLine("Margin(%): " + Margin)
+  TextWindow.WriteLine("Profit($): " + Profit)
+  TextWindow.WriteLine("Markup(%): " + Markup)
+  TextWindow.WriteLine("  Cost($): " + Cost)
+  Repeat()
+EndSub
+
+Sub Repeat
+  TextWindow.WriteLine("")
+  TextWindow.WriteLine("Enter 'yes' for another calculation.")
+  TextWindow.Write("Press any other key to exit: ")
+  newCalc = TextWindow.Read()
+  If newCalc = "yes" Then
+    TextWindow.Clear()
+    Display_Menu()
+  Else
+    Program.End()
+  EndIf
+EndSub

@@ -1,0 +1,54 @@
+Ask for 2 input values from the following:
+
+MU or GM and 1 of COG;GP;SP
+Any 2 of COG;GP;SP
+
+Determine which 2 values have been entered
+
+Call Calc function passing the entered values and types  ( Ex. Calc (COG, 100.00, MU, 150.00))
+
+Function Calc(Name1 As String, Value As Single, Name2 As String, Value2 As Single)
+
+Select Case Type1 & Type2
+  Case COG & MU
+	SP = COG+(COG*MU)
+	GP = SP-COG
+	GM = GP/SP
+  Case COG & GP
+	SP = COG+GP
+	GM = GP/SP
+	MU = GP/COG
+  Case COG & GM
+	GP = COG*(GM/(1-GM))
+	SP = COG+GP
+	MU = GP/COG
+  Case COG & SP
+	GP = SP-COG
+	GM = GP/SP
+	MU = GP/COG
+  Case MU & GP
+	COG = GP/MU
+	SP = COG+GP
+	GM = GP/SP
+  Case MU & GM
+	MsgBox("This calculation is not possible. Please enter MU OR GM and any other value.")
+  Case MU & SP
+	COG = SP/(1+MU)
+	GP = COG*MU
+	GM = GP / SP
+  Case GP & GM
+	SP = GP/GM
+	COG = SP-GP
+	MU = GP/COG
+  Case GP & SP
+	COG = SP-GP
+	MU = GP/COG
+	GM = GP/SP
+  Case GM & SP
+	GP = SP*GM
+	COG = SP-GP
+	MU = GP/COG
+End Select
+
+End Function 
+ 
